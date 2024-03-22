@@ -1,209 +1,152 @@
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
-import java.io.*;
-import java.util.concurrent.*;
+import java.util.Scanner;
 
-// Clase Animal
-class Animal {
-    private String nombre;
-    private int edad;
-    private String especie;
-    private String estadoSalud;
+public class Main {
+    private static final double PI = 3.1416;
 
-    public Animal(String nombre, int edad, String especie, String estadoSalud) {
-        this.nombre = nombre;
-        this.edad = edad;
-        this.especie = especie;
-        this.estadoSalud = estadoSalud;
-    }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int tipoFigura, operacion;
+        boolean continuar = true;
+        ArrayList<String> operacionesRealizadas = new ArrayList<>();
+        ArrayList<Double> resultadosOperaciones = new ArrayList<>();
 
-    // Getters y setters
-    public String getNombre() {
-        return nombre;
-    }
+        while (continuar) {
+            System.out.println("\nCalculadora Geométrica");
+            System.out.println("\nOpciones de figuras geométricas: ");
+            System.out.println("\n1. Círculo");
+            System.out.println("\n2. Cuadrado");
+            System.out.println("\n3. Triángulo");
+            System.out.println("\n4. Rectángulo");
+            System.out.println("\n5. Pentágono");
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
+            System.out.print("\nSeleccione el tipo de figura que desea calcular: ");
+            tipoFigura = scanner.nextInt();
 
-    public int getEdad() {
-        return edad;
-    }
+            System.out.print("\n¿Qué operación desea realizar? \n\n1. para medir Area \n2. para medir el perímetro");
+            operacion = scanner.nextInt();
 
-    public void setEdad(int edad) {
-        this.edad = edad;
-    }
+            double[] resultados;
+            String operacionRealizada;
 
-    public String getEspecie() {
-        return especie;
-    }
+            switch (tipoFigura) {
+                case 1:
+                    resultados = calcularCirculo(scanner, operacion);
+                    operacionRealizada = operacion == 1 ? "Área de Círculo" : "Perímetro de Círculo";
+                    break;
+                case 2:
+                    resultados = calcularCuadrado(scanner, operacion);
+                    operacionRealizada = operacion == 1 ? "Área de Cuadrado" : "Perímetro de Cuadrado";
+                    break;
+                case 3:
+                    resultados = calcularTriangulo(scanner, operacion);
+                    operacionRealizada = operacion == 1 ? "Área de Triángulo" : "Perímetro de Triángulo";
+                    break;
+                case 4:
+                    resultados = calcularRectangulo(scanner, operacion);
+                    operacionRealizada = operacion == 1 ? "Área de Rectángulo" : "Perímetro de Rectángulo";
+                    break;
+                case 5:
+                    resultados = calcularPentagono(scanner, operacion);
+                    operacionRealizada = operacion == 1 ? "Área de Pentágono" : "Perímetro de Pentágono";
+                    break;
+                default:
+                    System.out.println("\nOPCIÓN INVALIDA.");
+                    continue;
+            }
 
-    public void setEspecie(String especie) {
-        this.especie = especie;
-    }
+            if (resultados != null) {
+                System.out.println("Resultado de " + operacionRealizada + ":");
+                for (double resultado : resultados) {
+                    System.out.println(String.format("%.2f", resultado));
+                    resultadosOperaciones.add(resultado);
+                }
+                operacionesRealizadas.add(operacionRealizada);
+            }
 
-    public String getEstadoSalud() {
-        return estadoSalud;
-    }
+            System.out.print("\n¿Desea realizar otra operación? (Si/No): ");
+            String respuesta = scanner.next();
 
-    public void setEstadoSalud(String estadoSalud) {
-        this.estadoSalud = estadoSalud;
-    }
-
-    @Override
-    public String toString() {
-        return "Animal [nombre=" + nombre + ", edad=" + edad + ", especie=" + especie + ", estadoSalud=" + estadoSalud + "]";
-    }
-}
-
-// Clase Refugio
-class Refugio {
-    private List<Animal> animales;
-    private List<String> solicitudesAdopcion;
-    private ExecutorService executor;
-
-    public Refugio() {
-        animales = new ArrayList<>();
-        solicitudesAdopcion = new ArrayList<>();
-        executor = Executors.newFixedThreadPool(10);
-    }
-
-    // Agregar nuevo animal al refugio
-    public void agregarAnimal(Animal animal) {
-        animales.add(animal);
-    }
-
-    // Registrar solicitud de adopción
-    public void registrarSolicitudAdopcion(String nombreAnimal, String nombreAdoptante) {
-        solicitudesAdopcion.add(nombreAnimal + " - " + nombreAdoptante);
-    }
-
-    // Método para actualizar el estado de salud de un animal
-    public void actualizarEstadoSalud(String nombreAnimal, String nuevoEstadoSalud) {
-        for (Animal animal : animales) {
-            if (animal.getNombre().equals(nombreAnimal)) {
-                animal.setEstadoSalud(nuevoEstadoSalud);
-                break;
+            if (respuesta.equalsIgnoreCase("No")) {
+                continuar = false;
             }
         }
-    }
 
-    // Guardar datos del refugio en un archivo
-    public void guardarDatos(String archivo) throws IOException {
-        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(archivo))) {
-            oos.writeObject(animales);
-            oos.writeObject(solicitudesAdopcion);
+        // Imprimir operaciones realizadas al final
+        System.out.println("\nOperaciones realizadas:");
+        for (int i = 0; i < operacionesRealizadas.size(); i++) {
+            System.out.println(operacionesRealizadas.get(i) + ": " + String.format("%.2f", resultadosOperaciones.get(i)));
         }
     }
 
-    // Cargar datos del refugio desde un archivo
-    public void cargarDatos(String archivo) throws IOException, ClassNotFoundException {
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(archivo))) {
-            animales = (List<Animal>) ois.readObject();
-            solicitudesAdopcion = (List<String>) ois.readObject();
+    public static double[] calcularCirculo(Scanner scanner, int operacion) {
+        System.out.print("\nIngresa el radio del círculo: ");
+        double radio = scanner.nextDouble();
+        double resultado = 0;
+        if (operacion == 1) {
+            resultado = PI * radio * radio;
+        } else {
+            resultado = 2 * PI * radio;
         }
+        return new double[]{resultado};
     }
 
-    // Método para mostrar la lista de animales disponibles
-    public void mostrarAnimalesDisponibles() {
-        System.out.println("Animales disponibles en el refugio:");
-        for (Animal animal : animales) {
-            System.out.println(animal);
+    public static double[] calcularCuadrado(Scanner scanner, int operacion) {
+        System.out.print("\nIngresa la longitud del lado del cuadrado: ");
+        double lado = scanner.nextDouble();
+        double resultado = 0;
+        if (operacion == 1) {
+            resultado = lado * lado;
+        } else {
+            resultado = 4 * lado;
         }
+        return new double[]{resultado};
     }
 
-    // Método para mostrar las solicitudes de adopción pendientes
-    public void mostrarSolicitudesAdopcion() {
-        System.out.println("Solicitudes de adopción pendientes:");
-        for (String solicitud : solicitudesAdopcion) {
-            System.out.println(solicitud);
+    public static double[] calcularTriangulo(Scanner scanner, int operacion) {
+        double resultado = 0;
+        if (operacion == 1) {
+            System.out.print("\nIngresa la base y la altura del triángulo (separados por un espacio): ");
+            double base = scanner.nextDouble();
+            double altura = scanner.nextDouble();
+            resultado = 0.5 * base * altura;
+        } else {
+            System.out.print("\nIngresa la longitud de los tres lados del triángulo (separados por un espacio): ");
+            double lado1 = scanner.nextDouble();
+            double lado2 = scanner.nextDouble();
+            double lado3 = scanner.nextDouble();
+            resultado = lado1 + lado2 + lado3;
         }
+        return new double[]{resultado};
     }
 
-    // Método para cerrar el refugio
-    public void cerrarRefugio() {
-        executor.shutdown();
-    }
-}
-
-// Clase Adoptante
-class Adoptante {
-    private String nombre;
-    private String apellido;
-    private String direccion;
-
-    public Adoptante(String nombre, String apellido, String direccion) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.direccion = direccion;
-    }
-
-    // Getters y setters
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public String getDireccion() {
-        return direccion;
-    }
-
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
-    }
-
-
-    public String toString() {
-        return "Adoptante [nombre=" + nombre + ", apellido=" + apellido + ", direccion=" + direccion + "]";
-    }
-}
-
-// Clase principal que contiene la interfaz de usuario
-public class Main {
-    public static void main(String[] args) {
-        Refugio refugio = new Refugio();
-
-        // Agregar algunos animales al refugio
-        refugio.agregarAnimal(new Animal(" Firulais",  5, " Perro", " Bueno"));
-        refugio.agregarAnimal(new Animal(" Mittens",  3, " Gato", " Regular"));
-        refugio.agregarAnimal(new Animal(" Rex",  2, " Pez", " Excelente"));
-
-        // Mostrar animales disponibles
-        refugio.mostrarAnimalesDisponibles();
-
-        // Registrar solicitud de adopción
-        refugio.registrarSolicitudAdopcion("Firulais", "Juan Pérez");
-
-        // Mostrar solicitudes de adopción
-        refugio.mostrarSolicitudesAdopcion();
-
-        // Actualizar estado de salud de un animal
-        refugio.actualizarEstadoSalud("Mittens", "Bueno");
-
-        // Guardar y cargar datos del refugio desde un archivo
-        try {
-            refugio.guardarDatos("datos_refugio.dat");
-            refugio.cargarDatos("datos_refugio.dat");
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+    public static double[] calcularRectangulo(Scanner scanner, int operacion) {
+        double resultado = 0;
+        if (operacion == 1) {
+            System.out.print("\nIngresa la longitud y el ancho del rectángulo (separados por un espacio): ");
+            double longitud = scanner.nextDouble();
+            double ancho = scanner.nextDouble();
+            resultado = longitud * ancho;
+        } else {
+            System.out.print("\nIngresa la longitud y el ancho del rectángulo (separados por un espacio): ");
+            double longitud = scanner.nextDouble();
+            double ancho = scanner.nextDouble();
+            resultado = 2 * (longitud + ancho);
         }
+        return new double[]{resultado};
+    }
 
-        // Mostrar animales disponibles después de cargar datos
-        refugio.mostrarAnimalesDisponibles();
-
-        // Cerrar el refugio
-        refugio.cerrarRefugio();
+    public static double[] calcularPentagono(Scanner scanner, int operacion) {
+        double resultado = 0;
+        if (operacion == 1) {
+            System.out.print("\nIngresa la longitud de un lado del pentágono: ");
+            double lado = scanner.nextDouble();
+            resultado = 0.5 * lado * lado * (2.2361 + 5) * 0.2;
+        } else {
+            System.out.print("\nIngresa la longitud de un lado del pentágono: ");
+            double lado = scanner.nextDouble();
+            resultado = 5 * lado;
+        }
+        return new double[]{resultado};
     }
 }
